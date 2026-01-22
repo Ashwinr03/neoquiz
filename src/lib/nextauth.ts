@@ -1,20 +1,14 @@
 import { DefaultSession, getServerSession, NextAuthOptions } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { prisma } from "./db";
+import { prisma } from "./prisma";
 import GoogleProvider from "next-auth/providers/google";
+
 declare module "next-auth" {
-  interface Session extends DefaultSession{
+  interface Session extends DefaultSession {
     user: {
       id: string;
-      // ...other properties
-      // role: UserRole;
     } & DefaultSession["user"];
   }
-
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
 }
 
 declare module "next-auth/jwt" {
@@ -22,22 +16,29 @@ declare module "next-auth/jwt" {
     id: string;
   }
 }
+
 export const authOptions: NextAuthOptions = {
-    session:{
-        strategy: 'jwt'
-    },
-    callbacks: {
-        jwt: async ({ token }) => {
-      const db_user = await prisma.user.findFirst({
-        where: {
-          email: token?.email,
-        },
-      });
-      if (db_user) {
-        token.id = db_user.id;
+  session: {
+    strategy: "jwt",
+  },
+
+  callbacks: {
+    jwt: async ({ token }) => {
+      if (!token.email) return token;
+
+      if (!token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email },
+        });
+
+        if (dbUser) {
+          token.id = dbUser.id;
+        }
       }
+
       return token;
     },
+
     session: ({ session, token }) => {
       if (token) {
         session.user.id = token.id;
@@ -47,17 +48,17 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    },
+  },
 
-    secret: process.env.NEXTAUTH_SECRET,
-    adapter: PrismaAdapter(prisma),
-    providers: [
+  secret: process.env.NEXTAUTH_SECRET,
+  adapter: PrismaAdapter(prisma),
+
+  providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
   ],
-
 };
 
 export const getAuthSession = () => {

@@ -37,12 +37,23 @@ const UserAccountNav = ({ user }: Props) => {
       </DropdownMenuTrigger>
 
       <DropdownMenuPortal>
-        <DropdownMenuContent className="bg-white dark:bg-gray-900" align="end">
+        <DropdownMenuContent
+          align="end"
+          className="
+            bg-white dark:bg-black
+            border border-slate-200 dark:border-white/10
+            shadow-lg
+          "
+        >
           <div className="flex items-center gap-2 p-2">
             <div className="flex flex-col space-y-1 leading-none">
-              {user.name && <p className="font-medium">{user.name}</p>}
+              {user.name && (
+                <p className="font-medium text-slate-900 dark:text-slate-100">
+                  {user.name}
+                </p>
+              )}
               {user.email && (
-                <p className="w-[200px] truncate text-sm text-zinc-700 dark:text-zinc-300">
+                <p className="w-[200px] truncate text-sm text-slate-600 dark:text-slate-400">
                   {user.email}
                 </p>
               )}
@@ -61,20 +72,14 @@ const UserAccountNav = ({ user }: Props) => {
             onSelect={async (event) => {
               event.preventDefault();
 
-              // 1) Sign out but don't let next-auth redirect automatically
-              //    (redirect: false) ensures we stay on this client to show toast.
               await signOut({ redirect: false }).catch(console.error);
 
-              // 2) Show a toast so the user sees feedback
               toast({
                 title: "Signed out",
                 description: "You have been logged out successfully.",
               });
 
-              // 3) Wait a short moment so the toast is visible (300-800ms is usual).
-              //    Adjust delay if you want the toast to appear longer before navigation.
               setTimeout(() => {
-                // client-side navigate to homepage
                 router.push("/");
               }, 600);
             }}

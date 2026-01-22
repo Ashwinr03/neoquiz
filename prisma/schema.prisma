@@ -24,7 +24,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
-  @@index([userId], name: "account_userId")
+  @@index([userId])
 }
 
 model Session {
@@ -35,7 +35,7 @@ model Session {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId], name: "session_userId")
+  @@index([userId])
 }
 
 model User {
@@ -47,6 +47,9 @@ model User {
 
   accounts Account[]
   sessions Session[]
+
+  /** ✅ REQUIRED OPPOSITE RELATION **/
+  quizAttempts QuizAttempt[]
 }
 
 model VerificationToken {
@@ -55,4 +58,24 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+/* ================================
+   QUIZ HISTORY (PERSISTENT)
+   ================================ */
+model QuizAttempt {
+  id        String   @id @default(cuid())
+  userId    String
+
+  title     String
+  mode      String    // "PDF" | "PROMPT"
+  score     Int
+  total     Int
+  
+  data      Json
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
