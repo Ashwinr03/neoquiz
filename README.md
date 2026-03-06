@@ -4,7 +4,7 @@
 ![React](https://img.shields.io/badge/React-18-blue?logo=react)
 ![AI](https://img.shields.io/badge/AI-Google%20Gemini-blue)
 ![Database](https://img.shields.io/badge/Database-PostgreSQL-blue?logo=postgresql)
-![ORM](https://img.shields.io/badge/ORM-Prisma-2D3748?logo=prisma)
+![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma)
 ![Deploy](https://img.shields.io/badge/Deploy-Vercel-black?logo=vercel)
 
 **AI-powered quiz generator** that creates quizzes from prompts or PDF study material using **Google Gemini**.
